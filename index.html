@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Doom Fire Algorithm</title>
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 90vh;
+            }
+            #screen {
+                border: 10px solid gray;
+                image-rendering: crisp-edges;
+                width: 400px;
+                height: 400px;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="screen" width="40" height="40"></canvas>
+    </body>
+    <script>
+        original_palette = [
+            { r: 7, g: 7, b: 15 },
+            { r: 7, g: 7, b: 31 },
+            { r: 7, g: 15, b: 47 },
+            { r: 7, g: 15, b: 71 },
+            { r: 7, g: 23, b: 87 },
+            { r: 7, g: 31, b: 103 },
+            { r: 7, g: 31, b: 119 },
+            { r: 7, g: 39, b: 143 },
+            { r: 7, g: 47, b: 159 },
+            { r: 7, g: 63, b: 175 },
+            { r: 7, g: 71, b: 191 },
+            { r: 7, g: 79, b: 199 },
+            { r: 7, g: 95, b: 223 },
+            { r: 7, g: 111, b: 223 },
+            { r: 7, g: 127, b: 223 },
+            { r: 7, g: 143, b: 215 },
+            { r: 15, g: 151, b: 215 },
+            { r: 15, g: 159, b: 215 },
+            { r: 15, g: 167, b: 207 },
+            { r: 23, g: 175, b: 207 },
+            { r: 23, g: 183, b: 207 },
+            { r: 31, g: 191, b: 207 },
+            { r: 31, g: 199, b: 199 },
+            { r: 39, g: 207, b: 199 },
+            { r: 47, g: 215, b: 199 },
+            { r: 63, g: 223, b: 207 },
+            { r: 79, g: 223, b: 215 },
+            { r: 95, g: 223, b: 223 },
+            { r: 111, g: 231, b: 231 },
+            { r: 127, g: 239, b: 239 },
+            { r: 143, g: 239, b: 247 },
+            { r: 159, g: 247, b: 247 },
+            { r: 183, g: 247, b: 255 },
+            { r: 207, g: 247, b: 255 },
+            { r: 223, g: 251, b: 255 },
+            { r: 239, g: 251, b: 255 },
+            { r: 255, g: 255, b: 255 },
+        ];
+
+        const fireWidth = 40;
+        const fireHeight = 40;
+        const len = fireWidth * fireHeight;
+
+        arr = createDataStructure();
+
+        createFireSource();
+        renderFire();
+        setInterval(calculateFirePropagation, 50);
+
+        function createDataStructure() {
+            const arr = new Array(len);
+            for (let i = 0; i < len; i++) {
+                arr[i] = 0;
+            }
+            return arr;
+        }
+
+        function renderFire() {
+            const canvas = document.getElementById("screen");
+            const ctx = canvas.getContext("2d");
+
+            for (let i = 0; i < fireWidth; i++) {
+                for (let j = 0; j < fireHeight; j++) {
+                    const pixelIndex = j + i * fireWidth;
+
+                    const color = original_palette[arr[pixelIndex]];
+                    ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+
+                    ctx.fillRect(j, i, 1, 1);
+                }
+            }
+            requestAnimationFrame(renderFire);
+        }
+
+        function createFireSource() {
+            for (let col = 0; col < fireWidth; col++) {
+                const pixelIndex = len - fireWidth + col;
+                arr[pixelIndex] = 36;
+            }
+        }
+
+        function calculateFirePropagation() {
+            for (let i = 0; i < len; i++) {
+                const decay = Math.floor(Math.random() * 3);
+
+                const nextPixelIndex = i + fireWidth;
+                if (nextPixelIndex >= len) return;
+                const nextPixelFireIntensity = arr[nextPixelIndex];
+                const newFireIntensity = nextPixelFireIntensity - decay;
+                arr[i - decay] = newFireIntensity > 0 ? newFireIntensity : 0;
+            }
+        }
+    </script>
+</html>
